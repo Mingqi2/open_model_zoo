@@ -234,6 +234,9 @@ class BackgroundMattingAdapter(Adapter):
         raw_outputs = self._extract_predictions(raw, frame_meta)
         self.select_output_blob(raw_outputs)
         for identifier, output in zip(identifiers, raw_outputs[self.output_blob]):
+            ## Inference output is int16 type but expected output precision is FP16! 
+            if output.dtype == np.int16:
+                output.dtype= np.float16
             output *= 255
             result.append(BackgroundMattingPrediction(identifier, output.astype(np.uint8)))
 

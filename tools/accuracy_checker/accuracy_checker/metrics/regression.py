@@ -80,6 +80,9 @@ class BaseRegressionMetric(PerImageEvaluationMetric):
 
     def update(self, annotation, prediction):
         diff = self.calculate_diff(annotation, prediction)
+        print(annotation)
+        print(prediction)
+        print(diff)
         if isinstance(diff, dict):
             if not self.magnitude:
                 self.magnitude = OrderedDict()
@@ -121,7 +124,9 @@ class BaseRegressionMetric(PerImageEvaluationMetric):
             if not np.isscalar(diff) and np.size(diff) > 1:
                 diff = np.mean(diff)
             return diff
-        diff = self.value_differ(annotation.value, prediction.value)
+        ## for modnet, the original value type is U8 
+        ## the diff will overflow such as 0 - 3 when calculate MAE, so convert it to fp32
+        diff = self.value_differ(annotation.value.astype(np.float32), prediction.value.astype(np.float32))
         if not np.isscalar(diff) and np.size(diff) > 1:
             diff = np.mean(diff)
         return diff
